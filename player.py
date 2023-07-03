@@ -10,10 +10,17 @@ class Player():
         self.img = pygame.transform.scale(self.img, (BLOCK_SIZE, BLOCK_SIZE))
         self.correction_angle = 0
         self.bullets = []
+        self.can_shoot = True
+        self.shoot_frame = 0
+        self.shoot_delay = 60
+        self.ammo = 20
+
 
     def update(self):
         self.rotate()
         self.shoot()
+        if pygame.time.get_ticks() > self.shoot_frame + self.shoot_delay :
+            self.can_shoot = True
 
         for bullet in self.bullets:
             bullet.update()
@@ -21,8 +28,12 @@ class Player():
                 self.bullets.remove(bullet)
 
     def shoot(self):
-        if pygame.mouse.get_pressed()[0]:
-            self.bullets.append(Bullet(self.rect.x, self.rect.y, self.angle))
+        if self.can_shoot and self.ammo > 0:
+            if pygame.mouse.get_pressed()[0]:
+                self.bullets.append(Bullet(self.rect.x, self.rect.y, self.angle))
+                self.can_shoot = False
+                self.shoot_frame = pygame.time.get_ticks()
+                self.ammo -= 1
 
     def rotate(self):
         mx, my = pygame.mouse.get_pos()
